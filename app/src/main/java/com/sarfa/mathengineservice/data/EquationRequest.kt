@@ -9,6 +9,6 @@ data class EquationRequest(
     var id: Int = 0
 ) : Serializable
 
-enum class OperationType {
-    ADD, SUB, MUL, DIV
+enum class OperationType(val label: String) {
+    ADD("+"), SUB("-"), MUL("*"), DIV("/")
 }
