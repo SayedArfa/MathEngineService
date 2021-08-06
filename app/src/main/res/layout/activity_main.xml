@@ -83,6 +83,30 @@
         app:layout_constraintHeight_percent="0.4"
         app:layout_constraintTop_toBottomOf="@id/equationCard" />
 
+    <TextView
+        android:id="@+id/pendingRequestTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Pending"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/numbersRecyclerView"
+        app:layout_constraintWidth_percent="0.5" />
+
+    <TextView
+        android:id="@+id/completedRequestTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Completed"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/numbersRecyclerView"
+        app:layout_constraintWidth_percent="0.5" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pendingRequest"
         android:layout_width="0dp"
@@ -90,7 +114,7 @@
         android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/numbersRecyclerView"
+        app:layout_constraintTop_toBottomOf="@id/pendingRequestTitle"
         app:layout_constraintWidth_percent="0.5" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -100,6 +124,6 @@
         android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/numbersRecyclerView"
+        app:layout_constraintTop_toBottomOf="@id/completedRequestTitle"
         app:layout_constraintWidth_percent="0.5" />
 </androidx.constraintlayout.widget.ConstraintLayout>

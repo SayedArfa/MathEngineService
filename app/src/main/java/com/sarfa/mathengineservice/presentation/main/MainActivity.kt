@@ -7,12 +7,11 @@ import android.os.Bundle
 import android.os.IBinder
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.sarfa.mathengineservice.data.EquationRequest
-import com.sarfa.mathengineservice.data.OperationType
 import com.sarfa.mathengineservice.databinding.ActivityMainBinding
 import com.sarfa.mathengineservice.presentation.customviews.MaterialDropDown
 import com.sarfa.mathengineservice.services.MathEngineService
@@ -43,6 +42,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var numbersLayoutManager: GridLayoutManager
     private val numbersAdapter = NumbersAdapter()
 
+    private lateinit var pendingRequestLayoutManager: LinearLayoutManager
+    private val pendingRequestAdapter = EquationRequestAdapter()
+
+    private lateinit var completedRequestLayoutManager: LinearLayoutManager
+    private val completedRequestAdapter = EquationRequestAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
@@ -51,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         initOperationTypeDropDown()
         initTime()
         initNumbers()
+        initEquationsRecyclerView()
 
         viewBinding.calculateButton.setOnClickListener {
             Intent(this, MathEngineService::class.java).also { intent ->
@@ -94,8 +100,17 @@ class MainActivity : AppCompatActivity() {
         numbersLayoutManager = GridLayoutManager(this, 3)
         viewBinding.numbersRecyclerView.layoutManager = numbersLayoutManager
         viewBinding.numbersRecyclerView.adapter = numbersAdapter
-
         numbersAdapter.setItems(mainViewModel.selectedNumbers)
+    }
+
+    private fun initEquationsRecyclerView() {
+        pendingRequestLayoutManager = LinearLayoutManager(this)
+        viewBinding.pendingRequest.layoutManager = pendingRequestLayoutManager
+        viewBinding.pendingRequest.adapter = pendingRequestAdapter
+
+        completedRequestLayoutManager = LinearLayoutManager(this)
+        viewBinding.completedRequest.layoutManager = completedRequestLayoutManager
+        viewBinding.completedRequest.adapter = completedRequestAdapter
     }
 
     private val boundServiceConnection = object : ServiceConnection {
@@ -104,7 +119,16 @@ class MainActivity : AppCompatActivity() {
             (binder as? MathEngineService.LocalBinder)?.let {
                 mathEngineService = it.service
                 it.service.requestsLiveData.observe(this@MainActivity) {
-                    Log.d("sayed", it.toString())
+
+                    val pendingRequests = it.filter {
+                        it.second == null
+                    }
+                    val completedRequests = it.filter {
+                        it.second != null
+                    }
+
+                    pendingRequestAdapter.differ.submitList(pendingRequests)
+                    completedRequestAdapter.differ.submitList(completedRequests)
                 }
             }
         }
@@ -126,36 +150,5 @@ class MainActivity : AppCompatActivity() {
         if (isBound)
             unbindService(boundServiceConnection)
         super.onStop()
-    }
-
-    private fun sendTestRequests() {
-        Intent(this, MathEngineService::class.java).also { intent ->
-            intent.putExtra(
-                MathEngineService.EQUATION_REQUEST_KEY,
-                EquationRequest(listOf(1.0, 2.0, -2.0), OperationType.ADD, 30)
-            )
-            startService(intent)
-        }
-        Intent(this, MathEngineService::class.java).also { intent ->
-            intent.putExtra(
-                MathEngineService.EQUATION_REQUEST_KEY,
-                EquationRequest(listOf(1.0, 2.0, 3.0), OperationType.SUB, 20)
-            )
-            startService(intent)
-        }
-        Intent(this, MathEngineService::class.java).also { intent ->
-            intent.putExtra(
-                MathEngineService.EQUATION_REQUEST_KEY,
-                EquationRequest(listOf(1.0, 2.0, 0.0), OperationType.MUL, 10)
-            )
-            startService(intent)
-        }
-        Intent(this, MathEngineService::class.java).also { intent ->
-            intent.putExtra(
-                MathEngineService.EQUATION_REQUEST_KEY,
-                EquationRequest(listOf(1.0, 2.0, 0.0), OperationType.DIV, 5)
-            )
-            startService(intent)
-        }
     }
 }

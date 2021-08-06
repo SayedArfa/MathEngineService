@@ -35,7 +35,7 @@ class MathEngineService : Service() {
     }
 
     private fun handleEquationRequest(equationRequest: EquationRequest) {
-        equationRequest.id = requestList.size
+        equationRequest.id = getNewId()
         requestList.add(Pair(equationRequest, null))
         _requestsLiveData.postValue(requestList)
         scheduleRequest(equationRequest)
@@ -79,6 +79,11 @@ class MathEngineService : Service() {
             })
 
         compositeDisposable.add(d)
+    }
+
+    private var newId = 0
+    private fun getNewId(): Int {
+        return newId++
     }
 
     override fun onBind(intent: Intent?): IBinder {
