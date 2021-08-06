@@ -9,8 +9,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.sarfa.mathengineservice.core.extensions.hideKeyboard
 import com.sarfa.mathengineservice.data.EquationRequest
 import com.sarfa.mathengineservice.databinding.ActivityMainBinding
 import com.sarfa.mathengineservice.presentation.customviews.MaterialDropDown
@@ -23,7 +25,6 @@ class MainActivity : AppCompatActivity() {
     private var isBound = false
     private lateinit var viewBinding: ActivityMainBinding
 
-    @Inject
     lateinit var mainViewModel: MainViewModel
     private val timeTextChangeListener: TextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -53,27 +54,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         initOperationTypeDropDown()
         initTime()
         initNumbers()
         initEquationsRecyclerView()
 
         viewBinding.calculateButton.setOnClickListener {
-            Intent(this, MathEngineService::class.java).also { intent ->
-                intent.putExtra(
-                    MathEngineService.EQUATION_REQUEST_KEY,
-                    EquationRequest(
-                        mainViewModel.selectedNumbers.map {
-                            it.toDouble()
-                        },
-                        mainViewModel.allOperationTypes[mainViewModel.selectedOperationPos],
-                        mainViewModel.selectedTime.toLong()
-                    )
-                )
-                startService(intent)
-            }
+            it?.hideKeyboard()
+            calculate()
         }
-//        sendTestRequests()
     }
 
     private fun initOperationTypeDropDown() {
@@ -111,6 +101,38 @@ class MainActivity : AppCompatActivity() {
         completedRequestLayoutManager = LinearLayoutManager(this)
         viewBinding.completedRequest.layoutManager = completedRequestLayoutManager
         viewBinding.completedRequest.adapter = completedRequestAdapter
+    }
+
+    private fun calculate() {
+        if (validateRequest()) {
+            sendRequest()
+            resetNumbers()
+        }
+    }
+
+    private fun validateRequest(): Boolean {
+        return true
+    }
+
+    private fun resetNumbers() {
+        mainViewModel.selectedNumbers = mutableListOf("", "")
+        numbersAdapter.setItems(mainViewModel.selectedNumbers)
+    }
+
+    private fun sendRequest() {
+        Intent(this, MathEngineService::class.java).also { intent ->
+            intent.putExtra(
+                MathEngineService.EQUATION_REQUEST_KEY,
+                EquationRequest(
+                    mainViewModel.selectedNumbers.map {
+                        it.toDouble()
+                    },
+                    mainViewModel.allOperationTypes[mainViewModel.selectedOperationPos],
+                    mainViewModel.selectedTime.toLong()
+                )
+            )
+            startService(intent)
+        }
     }
 
     private val boundServiceConnection = object : ServiceConnection {
