@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.sarfa.mathengineservice.R
-import com.sarfa.mathengineservice.data.EquationRequest
+import com.sarfa.mathengineservice.domain.model.EquationRequest
 import com.sarfa.mathengineservice.databinding.EqutationItemBinding
 
 class EquationRequestAdapter :

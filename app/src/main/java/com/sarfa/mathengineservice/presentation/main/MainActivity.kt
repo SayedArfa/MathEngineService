@@ -13,7 +13,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sarfa.mathengineservice.core.extensions.hideKeyboard
-import com.sarfa.mathengineservice.data.EquationRequest
+import com.sarfa.mathengineservice.core.util.EventObserver
+import com.sarfa.mathengineservice.core.viewmodel.ViewModelFactory
 import com.sarfa.mathengineservice.databinding.ActivityMainBinding
 import com.sarfa.mathengineservice.presentation.customviews.MaterialDropDown
 import com.sarfa.mathengineservice.services.MathEngineService
@@ -23,6 +24,10 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
     private var mathEngineService: MathEngineService? = null
     private var isBound = false
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory<MainViewModel>
+
     private lateinit var viewBinding: ActivityMainBinding
 
     lateinit var mainViewModel: MainViewModel
@@ -37,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun afterTextChanged(s: Editable?) {
             mainViewModel.selectedTime = s.toString()
+            viewBinding.timeInputText.error = null
         }
 
     }
@@ -54,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        mainViewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
         initOperationTypeDropDown()
         initTime()
         initNumbers()
@@ -64,6 +70,11 @@ class MainActivity : AppCompatActivity() {
             it?.hideKeyboard()
             calculate()
         }
+
+        mainViewModel.validationErrorLiveData.observe(this, EventObserver {
+            viewBinding.timeInputText.error = it.delayTimeError
+            numbersAdapter.setItems(mainViewModel.selectedNumbers)
+        })
     }
 
     private fun initOperationTypeDropDown() {
@@ -104,35 +115,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun calculate() {
-        if (validateRequest()) {
-            sendRequest()
-            resetNumbers()
-        }
-    }
-
-    private fun validateRequest(): Boolean {
-        return true
-    }
-
-    private fun resetNumbers() {
-        mainViewModel.selectedNumbers = mutableListOf("", "")
-        numbersAdapter.setItems(mainViewModel.selectedNumbers)
-    }
-
-    private fun sendRequest() {
-        Intent(this, MathEngineService::class.java).also { intent ->
-            intent.putExtra(
-                MathEngineService.EQUATION_REQUEST_KEY,
-                EquationRequest(
-                    mainViewModel.selectedNumbers.map {
-                        it.toDouble()
-                    },
-                    mainViewModel.allOperationTypes[mainViewModel.selectedOperationPos],
-                    mainViewModel.selectedTime.toLong()
-                )
-            )
-            startService(intent)
-        }
+        mainViewModel.calculateEquation()
     }
 
     private val boundServiceConnection = object : ServiceConnection {

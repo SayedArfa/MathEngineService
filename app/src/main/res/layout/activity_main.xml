@@ -46,10 +46,10 @@
                 android:layout_height="60dp"
                 android:hint="time"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.35"
+                app:layout_constraintHorizontal_bias="0.4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.2">
+                app:layout_constraintWidth_percent="0.25">
 
                 <com.google.android.material.textfield.TextInputEditText
                     style="@style/InputEditText"
@@ -70,7 +70,7 @@
                 app:layout_constraintHorizontal_bias="0.95"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.4" />
+                app:layout_constraintWidth_percent="0.35" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 

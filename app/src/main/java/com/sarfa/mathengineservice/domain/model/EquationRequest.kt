@@ -1,4 +1,4 @@
-package com.sarfa.mathengineservice.data
+package com.sarfa.mathengineservice.domain.model
 
 import java.io.Serializable
 

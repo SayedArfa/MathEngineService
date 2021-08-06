@@ -6,8 +6,8 @@ import android.os.Binder
 import android.os.IBinder
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.sarfa.mathengineservice.data.EquationRequest
-import com.sarfa.mathengineservice.data.OperationType
+import com.sarfa.mathengineservice.domain.model.EquationRequest
+import com.sarfa.mathengineservice.domain.model.OperationType
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers

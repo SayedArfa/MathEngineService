@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sarfa.mathengineservice.R
 import com.sarfa.mathengineservice.databinding.AddNumberItemBinding
 import com.sarfa.mathengineservice.databinding.NumberItemBinding
+import com.sarfa.mathengineservice.presentation.NumberItem
 
 class NumbersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
@@ -16,9 +17,8 @@ class NumbersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private const val ADD_NUMBER_TYPE = 2
     }
 
-    private var numberList = mutableListOf<String>()
-
-    fun setItems(list: MutableList<String>) {
+    private var numberList = mutableListOf<NumberItem>()
+    fun setItems(list: MutableList<NumberItem>) {
         numberList = list
         notifyDataSetChanged()
     }
@@ -66,7 +66,9 @@ class NumbersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                numberList[adapterPosition] = s.toString()
+                numberList[adapterPosition].number = s.toString()
+                numberList[adapterPosition].validationError = null
+                viewBinding.numberInputText.error = null
             }
 
         }
@@ -80,7 +82,8 @@ class NumbersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
 
             viewBinding.numberInputText.editText?.removeTextChangedListener(textWatcher)
-            viewBinding.numberInputText.editText?.setText(numberList[position])
+            viewBinding.numberInputText.editText?.setText(numberList[position].number)
+            viewBinding.numberInputText.error = numberList[position].validationError
             viewBinding.numberInputText.editText?.addTextChangedListener(textWatcher)
 
         }
@@ -90,7 +93,7 @@ class NumbersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val viewBinding = AddNumberItemBinding.bind(itemView)
         fun bind() {
             viewBinding.addButton.setOnClickListener {
-                numberList.add("")
+                numberList.add(NumberItem(""))
                 notifyDataSetChanged()
             }
         }
