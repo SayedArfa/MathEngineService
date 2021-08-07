@@ -1,10 +1,6 @@
 package com.sarfa.mathengineservice.presentation.main
 
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.AdapterView
@@ -17,14 +13,10 @@ import com.sarfa.mathengineservice.core.util.EventObserver
 import com.sarfa.mathengineservice.core.viewmodel.ViewModelFactory
 import com.sarfa.mathengineservice.databinding.ActivityMainBinding
 import com.sarfa.mathengineservice.presentation.customviews.MaterialDropDown
-import com.sarfa.mathengineservice.services.MathEngineService
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    private var mathEngineService: MathEngineService? = null
-    private var isBound = false
-
     @Inject
     lateinit var viewModelFactory: ViewModelFactory<MainViewModel>
 
@@ -75,6 +67,14 @@ class MainActivity : AppCompatActivity() {
             viewBinding.timeInputText.error = it.delayTimeError
             numbersAdapter.setItems(mainViewModel.selectedNumbers)
         })
+
+        mainViewModel.pendingRequestsLiveData.observe(this) {
+            pendingRequestAdapter.differ.submitList(it)
+
+        }
+        mainViewModel.completedRequestsLiveData.observe(this) {
+            completedRequestAdapter.differ.submitList(it)
+        }
     }
 
     private fun initOperationTypeDropDown() {
@@ -118,42 +118,13 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.calculateEquation()
     }
 
-    private val boundServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-            isBound = true
-            (binder as? MathEngineService.LocalBinder)?.let {
-                mathEngineService = it.service
-                it.service.requestsLiveData.observe(this@MainActivity) {
-
-                    val pendingRequests = it.filter {
-                        it.second == null
-                    }
-                    val completedRequests = it.filter {
-                        it.second != null
-                    }
-
-                    pendingRequestAdapter.differ.submitList(pendingRequests)
-                    completedRequestAdapter.differ.submitList(completedRequests)
-                }
-            }
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            isBound = false
-            mathEngineService = null
-        }
-    }
-
     override fun onStart() {
         super.onStart()
-        val intent = Intent(this, MathEngineService::class.java)
-        startService(intent)
-        bindService(intent, boundServiceConnection, BIND_AUTO_CREATE)
+        mainViewModel.startBindService()
     }
 
     override fun onStop() {
-        if (isBound)
-            unbindService(boundServiceConnection)
+        mainViewModel.stopBindService()
         super.onStop()
     }
 }

@@ -7,11 +7,12 @@ import android.os.IBinder
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.sarfa.mathengineservice.domain.model.EquationRequest
-import com.sarfa.mathengineservice.domain.model.OperationType
-import io.reactivex.Observable
+import com.sarfa.mathengineservice.domain.usecase.CalculateUseCase
+import dagger.android.AndroidInjection
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class MathEngineService : Service() {
     companion object {
@@ -24,6 +25,7 @@ class MathEngineService : Service() {
     val requestsLiveData: LiveData<List<Pair<EquationRequest, Double?>>> = _requestsLiveData
     private val compositeDisposable = CompositeDisposable()
     override fun onCreate() {
+        AndroidInjection.inject(this)
         super.onCreate()
     }
 
@@ -41,32 +43,12 @@ class MathEngineService : Service() {
         scheduleRequest(equationRequest)
     }
 
+    @Inject
+    lateinit var calculateUseCase: CalculateUseCase
+
     private fun scheduleRequest(equationRequest: EquationRequest) {
-        val d = Observable.timer(equationRequest.delayTime, TimeUnit.SECONDS)
-            .subscribeOn(Schedulers.io()).map {
-                when (equationRequest.operationType) {
-                    OperationType.ADD -> {
-                        equationRequest.numbers.reduce { acc, i ->
-                            acc + i
-                        }
-                    }
-                    OperationType.SUB -> {
-                        equationRequest.numbers.reduce { acc, i ->
-                            acc - i
-                        }
-                    }
-                    OperationType.MUL -> {
-                        equationRequest.numbers.reduce { acc, i ->
-                            acc * i
-                        }
-                    }
-                    OperationType.DIV -> {
-                        equationRequest.numbers.reduce { acc, i ->
-                            acc / i
-                        }
-                    }
-                }
-            }.subscribe({ answer ->
+        val d = calculateUseCase.calculate(equationRequest).subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe({ answer ->
                 for (i in requestList.indices) {
                     if (requestList[i].first == equationRequest) {
                         requestList[i] = Pair(equationRequest, answer)

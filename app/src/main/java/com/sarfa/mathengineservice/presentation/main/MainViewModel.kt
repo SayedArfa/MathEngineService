@@ -1,9 +1,14 @@
 package com.sarfa.mathengineservice.presentation.main
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.sarfa.mathengineservice.core.util.Event
 import com.sarfa.mathengineservice.core.viewmodel.BaseViewModel
 import com.sarfa.mathengineservice.domain.model.EquationRequest
@@ -70,4 +75,55 @@ class MainViewModel @Inject constructor(private val validateEquationUseCase: Val
             context.startService(intent)
         }
     }
+
+    private val _pendingRequestsLiveData = MutableLiveData<List<Pair<EquationRequest, Double?>>>()
+    val pendingRequestsLiveData: LiveData<List<Pair<EquationRequest, Double?>>> =
+        _pendingRequestsLiveData
+
+    private val _completedRequestsLiveData = MutableLiveData<List<Pair<EquationRequest, Double?>>>()
+    val completedRequestsLiveData: LiveData<List<Pair<EquationRequest, Double?>>> =
+        _completedRequestsLiveData
+
+    fun startBindService() {
+        val intent = Intent(context, MathEngineService::class.java)
+        context.startService(intent)
+        context.bindService(intent, boundServiceConnection, AppCompatActivity.BIND_AUTO_CREATE)
+    }
+
+    fun stopBindService() {
+        if (isBound)
+            context.unbindService(boundServiceConnection)
+    }
+
+    private val observer =
+        Observer<List<Pair<EquationRequest, Double?>>> { t ->
+            t?.let {
+                val pendingRequests = it.filter {
+                    it.second == null
+                }
+                val completedRequests = it.filter {
+                    it.second != null
+                }
+
+                _pendingRequestsLiveData.value = pendingRequests
+                _completedRequestsLiveData.value = completedRequests
+
+            }
+        }
+
+    private var isBound = false
+    private val boundServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            isBound = true
+            (binder as? MathEngineService.LocalBinder)?.let {
+                it.service.requestsLiveData.observeForever(observer)
+            }
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isBound = false
+        }
+    }
+
+
 }
