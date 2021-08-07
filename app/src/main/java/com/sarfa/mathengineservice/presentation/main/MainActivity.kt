@@ -1,5 +1,6 @@
 package com.sarfa.mathengineservice.presentation.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +14,7 @@ import com.sarfa.mathengineservice.core.util.EventObserver
 import com.sarfa.mathengineservice.core.viewmodel.ViewModelFactory
 import com.sarfa.mathengineservice.databinding.ActivityMainBinding
 import com.sarfa.mathengineservice.presentation.customviews.MaterialDropDown
+import com.sarfa.mathengineservice.presentation.gps.GpsActivity
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -76,6 +78,12 @@ class MainActivity : AppCompatActivity() {
         }
         mainViewModel.completedRequestsLiveData.observe(this) {
             completedRequestAdapter.differ.submitList(it)
+        }
+
+        viewBinding.fab.setOnClickListener {
+            Intent(this, GpsActivity::class.java).also { intent ->
+                startActivity(intent)
+            }
         }
     }
 

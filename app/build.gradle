@@ -76,4 +76,7 @@ dependencies {
     androidTestImplementation "com.google.truth:truth:1.1.3"
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
 
+    // play services location
+    implementation "com.google.android.gms:play-services-location:15.0.1"
+
 }
