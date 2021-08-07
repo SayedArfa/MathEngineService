@@ -21,8 +21,10 @@
     <style name="card_style">
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
-        <item name="cardBackgroundColor">@android:color/white</item>
+        <item name="cardBackgroundColor">@color/light_gray</item>
         <item name="cardCornerRadius">6dp</item>
         <item name="cardUseCompatPadding">true</item>
     </style>
+
+    <color name="light_gray">#F5F5F5</color>
 </resources>

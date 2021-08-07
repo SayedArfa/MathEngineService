@@ -11,12 +11,13 @@
         android:id="@+id/equationCard"
         style="@style/card_style"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.5"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
 
@@ -71,40 +72,43 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.35" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/numbersRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/timeInputText" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/numbersRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintHeight_percent="0.4"
-        app:layout_constraintTop_toBottomOf="@id/equationCard" />
 
     <TextView
         android:id="@+id/pendingRequestTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="Pending"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/numbersRecyclerView"
+        app:layout_constraintTop_toBottomOf="@id/equationCard"
         app:layout_constraintWidth_percent="0.5" />
 
     <TextView
         android:id="@+id/completedRequestTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="Completed"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/numbersRecyclerView"
+        app:layout_constraintTop_toBottomOf="@id/equationCard"
         app:layout_constraintWidth_percent="0.5" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -126,6 +130,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/completedRequestTitle"
         app:layout_constraintWidth_percent="0.5" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintBottom_toBottomOf="@id/pendingRequest"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/pendingRequest" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
