@@ -21,15 +21,16 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class MainViewModel @Inject constructor(private val validateEquationUseCase: ValidateEquationUseCase) :
+class MainViewModel @Inject constructor(
+    private val context: Context,
+    private val validateEquationUseCase: ValidateEquationUseCase
+) :
     BaseViewModel() {
     var selectedOperationPos = 0
     val allOperationTypes = OperationType.values()
     var selectedNumbers = mutableListOf(NumberItem(""), NumberItem(""))
     var selectedTime = "10"
 
-    @Inject
-    lateinit var context: Context
     private val _validationErrorLiveData =
         MutableLiveData<Event<EquationValidationResult.InValid>>()
     val validationErrorLiveData:
@@ -124,6 +125,4 @@ class MainViewModel @Inject constructor(private val validateEquationUseCase: Val
             isBound = false
         }
     }
-
-
 }
