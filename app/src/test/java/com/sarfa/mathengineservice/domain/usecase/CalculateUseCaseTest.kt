@@ -6,7 +6,7 @@ import junit.framework.TestCase
 
 class CalculateUseCaseTest : TestCase() {
 
-    private val calculateUseCase = CalculateUseCase()
+    private val calculateUseCase = CalculateEquationUseCase()
     fun testCalculate() {
         calculateUseCase.calculate(EquationRequest(listOf(1.0, 2.0), OperationType.ADD, 10))
             .test().assertValue(3.0)

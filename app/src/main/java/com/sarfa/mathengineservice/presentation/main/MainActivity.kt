@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun afterTextChanged(s: Editable?) {
             mainViewModel.selectedTime = s.toString()
+            viewBinding.timeInputText.isErrorEnabled = false
             viewBinding.timeInputText.error = null
         }
 
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainViewModel.validationErrorLiveData.observe(this, EventObserver {
+            viewBinding.timeInputText.isErrorEnabled = it.delayTimeError != null
             viewBinding.timeInputText.error = it.delayTimeError
             numbersAdapter.setItems(mainViewModel.selectedNumbers)
         })

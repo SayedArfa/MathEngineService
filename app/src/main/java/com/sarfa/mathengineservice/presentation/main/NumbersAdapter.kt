@@ -69,6 +69,7 @@ class NumbersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 numberList[adapterPosition].number = s.toString()
                 numberList[adapterPosition].validationError = null
                 viewBinding.numberInputText.error = null
+                viewBinding.numberInputText.isErrorEnabled = false
             }
 
         }
@@ -84,6 +85,8 @@ class NumbersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             viewBinding.numberInputText.editText?.removeTextChangedListener(textWatcher)
             viewBinding.numberInputText.editText?.setText(numberList[position].number)
             viewBinding.numberInputText.error = numberList[position].validationError
+            viewBinding.numberInputText.isErrorEnabled =
+                numberList[position].validationError != null
             viewBinding.numberInputText.editText?.addTextChangedListener(textWatcher)
 
         }

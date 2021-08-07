@@ -7,7 +7,7 @@ import android.os.IBinder
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.sarfa.mathengineservice.domain.model.EquationRequest
-import com.sarfa.mathengineservice.domain.usecase.CalculateUseCase
+import com.sarfa.mathengineservice.domain.usecase.CalculateEquationUseCase
 import dagger.android.AndroidInjection
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -46,11 +46,11 @@ class MathEngineService : Service() {
     }
 
     @Inject
-    lateinit var calculateUseCase: CalculateUseCase
+    lateinit var calculateEquationUseCase: CalculateEquationUseCase
 
     private fun scheduleRequest(equationRequest: EquationRequest) {
         val d = Observable.timer(equationRequest.delayTime, TimeUnit.SECONDS).concatMap {
-            return@concatMap calculateUseCase.calculate(equationRequest)
+            return@concatMap calculateEquationUseCase.calculate(equationRequest)
         }.subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
             .subscribe({ answer ->
                 for (i in requestList.indices) {

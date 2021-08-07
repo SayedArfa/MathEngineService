@@ -46,7 +46,7 @@ class MainViewModel @Inject constructor(private val validateEquationUseCase: Val
             .subscribe({
                 when (it) {
                     is EquationValidationResult.Valid -> {
-                        sendRequest(it.equationRequest)
+                        sendEquationRequest(it.equationRequest)
                     }
                     is EquationValidationResult.InValid -> {
                         if (it.numbersError.isNotEmpty()) {
@@ -66,7 +66,7 @@ class MainViewModel @Inject constructor(private val validateEquationUseCase: Val
         compositeDisposable.add(d)
     }
 
-    private fun sendRequest(equationRequest: EquationRequest) {
+    private fun sendEquationRequest(equationRequest: EquationRequest) {
         Intent(context, MathEngineService::class.java).also { intent ->
             intent.putExtra(
                 MathEngineService.EQUATION_REQUEST_KEY,
