@@ -9,9 +9,11 @@ import androidx.lifecycle.MutableLiveData
 import com.sarfa.mathengineservice.domain.model.EquationRequest
 import com.sarfa.mathengineservice.domain.usecase.CalculateUseCase
 import dagger.android.AndroidInjection
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MathEngineService : Service() {
@@ -47,8 +49,10 @@ class MathEngineService : Service() {
     lateinit var calculateUseCase: CalculateUseCase
 
     private fun scheduleRequest(equationRequest: EquationRequest) {
-        val d = calculateUseCase.calculate(equationRequest).subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread()).subscribe({ answer ->
+        val d = Observable.timer(equationRequest.delayTime, TimeUnit.SECONDS).concatMap {
+            return@concatMap calculateUseCase.calculate(equationRequest)
+        }.subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ answer ->
                 for (i in requestList.indices) {
                     if (requestList[i].first == equationRequest) {
                         requestList[i] = Pair(equationRequest, answer)
@@ -59,7 +63,6 @@ class MathEngineService : Service() {
             }, {
                 it.printStackTrace()
             })
-
         compositeDisposable.add(d)
     }
 

@@ -62,4 +62,6 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:2.37"
 
+    // truth
+    testImplementation "com.google.truth:truth:1.1.3"
 }
