@@ -3,14 +3,13 @@ package com.sarfa.mathengineservice.presentation.gps
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
+import android.os.Looper
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.sarfa.mathengineservice.databinding.ActivityGpsBinding
 
 class GpsActivity : AppCompatActivity() {
@@ -56,11 +55,30 @@ class GpsActivity : AppCompatActivity() {
             )
             return
         }
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location: Location? ->
+
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private val locationRequest =
+        LocationRequest.create()?.apply {
+            interval = 10000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult?) {
+            locationResult ?: return
+            for (location in locationResult.locations) {
                 viewBinding.locationTextView.text = "Location: " + location?.let {
                     "${it.longitude} : ${it.latitude}"
                 }
             }
+        }
     }
+
 }
